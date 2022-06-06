@@ -11,8 +11,8 @@ import SwiftUI
 struct SearchView: View {
     var body: some View {
         Text("SearchView")
-            .navigationTitle("Test")
-            
+            .navigationTitle("")
+            .navigationBarHidden(true)
     }
 }
 

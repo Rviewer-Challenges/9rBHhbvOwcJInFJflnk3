@@ -11,6 +11,8 @@ import SwiftUI
 struct MessagesView: View {
     var body: some View {
         Text("MessagesView")
+            .navigationTitle("")
+            .navigationBarHidden(true)
     }
 }
 

@@ -9,39 +9,51 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @State private var selectedTab = Tab.home
+    @ObservedObject private var sideMenu = SideMenuState()
+    @State private var dragOffset = CGSize.zero
+    
     var body: some View {
-        TabView {
-            HomeView().tabItem {
-                Image(systemName: "house")
+        ZStack(alignment: .leading) {
+            TabView(selection: $selectedTab) {
+                HomeView().tag(Tab.home)
+                    .tabItem {
+                        Image(systemName: "house")
+                    }
+                SearchView().tag(Tab.search)
+                    .tabItem {
+                        Image(systemName: "magnifyingglass")
+                    }
+                NotificationsView().tag(Tab.notifications)
+                    .tabItem {
+                        Image(systemName: "bell")
+                    }
+                MessagesView().tag(Tab.messages)
+                    .tabItem {
+                        Image(systemName: "house")
+                    }
             }
-            SearchView().tabItem {
-                Image(systemName: "magnifyingglass")
-            }
-            NotificationsView().tabItem {
-                Image(systemName: "bell")
-            }
-            MessagesView().tabItem {
-                Image(systemName: "house")
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            // Small profile image -> opens the menu.
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { }) {
-                    Circle()
-                        .frame(width: 40)
-                        .aspectRatio(1, contentMode: .fill)
-                }
-            }
+            .environmentObject(sideMenu)
             
-            // Button to change some preferences.
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { }) {
-                    Image(systemName: "star")
-                }
-            }
+            SideMenuView()
+                .frame(width: 200)
+                .offset(x: sideMenu.isShowing ? 0 : -200, y: 0)
         }
+        .navigationBarHidden(true)
+        .animation(.easeInOut, value: sideMenu.isShowing)
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    dragOffset = value.translation
+                }
+                .onEnded { _ in
+                    if dragOffset.width > 0 {
+                        sideMenu.isShowing = true
+                    } else {
+                        sideMenu.isShowing = false
+                    }
+                }
+        )
     }
 }
 
@@ -50,5 +62,11 @@ struct MainTabView_Previews: PreviewProvider {
         NavigationView {
             MainTabView()
         }
+    }
+}
+
+extension MainTabView {
+    class SideMenuState: ObservableObject {
+        @Published var isShowing = false
     }
 }
